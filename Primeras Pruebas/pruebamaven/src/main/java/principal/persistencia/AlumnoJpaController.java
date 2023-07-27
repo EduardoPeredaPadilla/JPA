@@ -7,8 +7,10 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.Persistence;
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+//import javax.persistence.criteria.Selection;
 
 import principal.logica.Alumno;
 import principal.persistencia.exceptions.NonexistentEntityException;
@@ -98,8 +100,8 @@ public class AlumnoJpaController implements Serializable {
     private List<Alumno> findAlumnoEntities(boolean all, int maxResults, int firstResult) {
         EntityManager em = getEntityManager();
         try {
-            CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            cq.select(cq.from(Alumno.class));
+            CriteriaQuery<Alumno> cq = em.getCriteriaBuilder().createQuery(Alumno.class);
+            cq.select( cq.from(Alumno.class));
             Query q = em.createQuery(cq);
             if (!all) {
                 q.setMaxResults(maxResults);
@@ -123,9 +125,10 @@ public class AlumnoJpaController implements Serializable {
     public int getAlumnoCount() {
         EntityManager em = getEntityManager();
         try {
-            CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
+            CriteriaBuilder cb = em.getCriteriaBuilder();
+            CriteriaQuery<Long> cq = cb.createQuery(Long.class);
             Root<Alumno> rt = cq.from(Alumno.class);
-            cq.select(em.getCriteriaBuilder().count(rt));
+            cq.select(cb.count(rt));
             Query q = em.createQuery(cq);
             return ((Long) q.getSingleResult()).intValue();
         } finally {

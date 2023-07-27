@@ -7,6 +7,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.Persistence;
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
@@ -98,7 +99,7 @@ public class MateriaJpaController implements Serializable {
     private List<Materia> findMateriaEntities(boolean all, int maxResults, int firstResult) {
         EntityManager em = getEntityManager();
         try {
-            CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
+            CriteriaQuery<Materia> cq = em.getCriteriaBuilder().createQuery(Materia.class);
             cq.select(cq.from(Materia.class));
             Query q = em.createQuery(cq);
             if (!all) {
@@ -123,9 +124,10 @@ public class MateriaJpaController implements Serializable {
     public int getMateriaCount() {
         EntityManager em = getEntityManager();
         try {
-            CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
+            CriteriaBuilder cb = em.getCriteriaBuilder();
+            CriteriaQuery<Long> cq = cb.createQuery(Long.class);
             Root<Materia> rt = cq.from(Materia.class);
-            cq.select(em.getCriteriaBuilder().count(rt));
+            cq.select(cb.count(rt));
             Query q = em.createQuery(cq);
             return ((Long) q.getSingleResult()).intValue();
         } finally {
