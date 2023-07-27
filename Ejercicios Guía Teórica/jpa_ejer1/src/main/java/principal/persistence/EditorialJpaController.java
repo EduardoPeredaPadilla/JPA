@@ -12,8 +12,6 @@ import javax.persistence.Persistence;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-
-import principal.logica.entities.Autor;
 import principal.logica.entities.Editorial;
 import principal.persistence.exceptions.NonexistentEntityException;
 

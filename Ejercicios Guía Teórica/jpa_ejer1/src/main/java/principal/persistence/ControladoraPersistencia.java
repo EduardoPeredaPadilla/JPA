@@ -152,12 +152,12 @@ public class ControladoraPersistencia {
         return libroJpa.findLibroByName(titulo);
     }
 
-    public Libro traerLibroPorAutor(Autor autor) {
+    public List<Libro> traerLibroPorAutor(Autor autor) {
 
         return libroJpa.findLibroByAutor(autor);
     }
 
-    public Libro traerLibroPorEditorial(Editorial editorial) {
+    public List<Libro> traerLibroPorEditorial(Editorial editorial) {
 
         return libroJpa.findLibroByEditorial(editorial);
     }

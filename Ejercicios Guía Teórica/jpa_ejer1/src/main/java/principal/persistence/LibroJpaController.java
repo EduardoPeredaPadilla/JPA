@@ -5,7 +5,9 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -127,25 +129,37 @@ public class LibroJpaController implements Serializable {
     public Libro findLibroByName(String titulo) {
         EntityManager em = getEntityManager();
         try {
-            return em.find(Libro.class, titulo);
+            TypedQuery<Libro> query = em.createQuery("SELECT l FROM Libro l WHERE TRIM(LOWER(l.titulo)) = :titulo", Libro.class);
+            query.setParameter("titulo", titulo.toLowerCase().trim());
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            return null; // Devuelve null si no se encuentra el autor por el nombre
         } finally {
             em.close();
         }
     }
 
-    public Libro findLibroByAutor(Autor autor) {
+    public List<Libro> findLibroByAutor(Autor autor) {
         EntityManager em = getEntityManager();
         try {
-            return em.find(Libro.class, autor);
+            TypedQuery<Libro> query = em.createQuery("SELECT l FROM Libro l WHERE l.autor.id = :autor_id", Libro.class);
+            query.setParameter("autor_id", autor.getId());
+            return query.getResultList();
+        } catch (NoResultException e) {
+            return null; // Devuelve null si no se encuentra el autor por el nombre
         } finally {
             em.close();
         }
     }
 
-    public Libro findLibroByEditorial(Editorial editorial) {
+    public List<Libro> findLibroByEditorial(Editorial editorial) {
         EntityManager em = getEntityManager();
         try {
-            return em.find(Libro.class, editorial);
+            TypedQuery<Libro> query = em.createQuery("SELECT l FROM Libro l WHERE l.editorial.id = :editorial_id", Libro.class);
+            query.setParameter("editorial_id", editorial.getId());
+            return query.getResultList();
+        } catch (NoResultException e) {
+            return null; // Devuelve null si no se encuentra el autor por el nombre
         } finally {
             em.close();
         }
