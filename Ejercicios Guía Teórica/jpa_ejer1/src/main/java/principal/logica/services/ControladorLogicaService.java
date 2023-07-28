@@ -1,12 +1,23 @@
 package principal.logica.services;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
+
+import javax.sound.midi.Soundbank;
+
+import com.mysql.cj.xdevapi.Client;
+
+import javafx.scene.control.Menu;
 import principal.logica.entities.Autor;
+import principal.logica.entities.Cliente;
 import principal.logica.entities.Editorial;
 import principal.logica.entities.Libro;
+import principal.logica.entities.Prestamo;
 import principal.persistence.ControladoraPersistencia;
 
 public class ControladorLogicaService {
@@ -601,4 +612,179 @@ public class ControladorLogicaService {
             }
         }
     }
+
+    //Métodos para los Prestamos
+    public void agregarPrestamo(Scanner scanInt) throws Exception {
+
+        System.out.println("------------------ REGISTRAR NUEVO PRESTAMO -----------------");
+        System.out.println("");
+        Prestamo prestamo = null;
+        try {
+            //Dfinimos el cliente para el prestamo
+            System.out.println("Seleccionar//Agregar cliente");
+            Cliente cliente = buscarClientePorNombredesdePrestamo(scanInt);
+            // Definimos la fecha del prestamo fecha actual
+            System.out.println("Fecha del prestamo");
+            LocalDate fechaHoy = LocalDate.now();
+            System.out.println(fechaHoy);
+            Date fechaPrestamo = Date.from(fechaHoy.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            LocalDate fechaDev = LocalDate.of(fechaHoy.getYear(), fechaHoy.getMonth(), fechaHoy.getDayOfMonth() + 3);
+            System.out.println(fechaDev);
+            Date fechaDevolucion = Date.from(fechaDev.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            // Definimos el libro para el prestamo
+            Libro libro = buscarLibroPorTituloParaPrestamo(scanInt);
+            prestamo = new Prestamo(fechaPrestamo, fechaDevolucion, libro, cliente);
+            controlPersis.crearPrestamo(prestamo);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public void agregarClientedesdePrestamo(Cliente cliente) throws Exception {
+
+        controlPersis.crearCliente(cliente);
+    }
+
+    public Cliente buscarClientePorNombredesdePrestamo(Scanner scanInt) throws Exception {
+        
+        System.out.println("------------- BUSCAR CLIENTE POR NOMBRE ----------------");
+        System.out.println("Ingresa el Nombre del cliente");
+        String clientName = scanInt.next();
+        Cliente cliente = controlPersis.traerClientePorNombre(clientName);
+        int respC = 0;
+        long documento = 0;
+        String apellido;
+        String telefono;
+        if (cliente == null) {
+            System.out.println("No sé encontro el cliente, ¿deseas registrarlo como nuevo cliente?");
+            System.out.println("1. Agregar como nuevo cliente");
+            System.out.println("2. Buscar otro cliente");
+            System.out.println("Ingresa la opción deseada");
+            try {
+                respC = scanInt.nextInt();
+            } catch (InputMismatchException e) {
+                System.out.println("Caracter inválido");
+                buscarClientePorNombredesdePrestamo(scanInt);
+            }
+            switch (respC) {
+                case 1:
+                    System.out.println("Ingresa el número de documento del nuevo cliente");
+                    try {
+                        documento = scanInt.nextLong();
+                    } catch (InputMismatchException e) {
+                        System.out.println("Caracter invalido");
+                        buscarClientePorNombredesdePrestamo(scanInt);
+                    }
+                    System.out.println("Ingresa el apellido del nuevo Cliente");
+                    apellido = scanInt.next();
+                    System.out.println("Ingresa elteléfono del nuevo cliente");
+                    telefono = scanInt.next();
+                    cliente = new Cliente(documento, clientName, apellido, telefono);
+                    agregarClientedesdePrestamo(cliente);
+                    return cliente;
+                case 2:
+                    buscarClientePorNombredesdePrestamo(scanInt);
+                    break;
+                default:
+                    System.out.println("Opción fuera del rango de respuesta");
+                    buscarClientePorNombredesdePrestamo(scanInt);
+                    break;
+            }
+        } else {
+            return cliente;
+        }
+        return cliente;
+    }
+
+    public Libro buscarLibroPorTituloParaPrestamo(Scanner scanInt) throws Exception {
+
+        System.out.println("Ingresa el título del libro buscado");
+        String titulo = scanInt.next();
+        Libro libro = controlPersis.traerLibroPorTitulo(titulo);
+        int respLP = 0;
+        if (libro == null) {
+            System.out.println("No se encontró el libro");
+            System.out.println("Deseas buscar otro libro?");
+            System.out.println("1. Buscar otro libro");
+            System.out.println("2. Regresar al Menú Principal");
+            System.out.println("Ingresa la opción deseada");
+            try {
+                respLP = scanInt.nextInt();
+            } catch (InputMismatchException e) {
+                System.out.println("Caracter inválido");
+                buscarLibroPorTituloParaPrestamo(scanInt);
+            }
+            switch (respLP) {
+                case 1:
+                    buscarAutorPorNombre(scanInt);
+                    break;
+                case 2:
+                    break;
+                default:
+                    System.out.println("Respuesta fuera del rango de opciones");
+                    buscarLibroPorTituloParaPrestamo(scanInt);
+                    break;
+            }
+        } else {
+            if (libro.getEjemplaresRestantes() > 0) {
+                libro.setEjemplaresPrestados(libro.getEjemplaresPrestados() + 1);
+                libro.setEjemplaresRestantes(libro.getEjemplares() - libro.getEjemplaresPrestados());
+                return libro;    
+            } else {
+                System.out.println("No hay ejemplares en stock para presta de este libro");
+                System.out.println("Buscar otro libro");
+                buscarLibroPorTituloParaPrestamo(scanInt);
+            }
+        }
+        return libro;
+    }
+    
+    public void mostrarPrestamos() throws Exception {
+
+        
+        System.out.println("-------------- LISTA DE PRESTAMOS -----------------");
+        System.out.println("");
+        ArrayList<Prestamo> prestamos = controlPersis.traerListaPrestamos();
+        for (Prestamo  prestamo : prestamos) {
+            System.out.println(prestamo.toString());   
+        }
+        System.out.println("");
+    }
+    
+    //Métodos para los Clientes
+    public void agregarCliente(Scanner scanInt) throws Exception {
+
+        System.out.println("----------- AGREGAR UN NUEVO CLIENTE ----------------");
+        System.out.println("");
+        Cliente cliente = null;
+        System.out.println("Ingresa el número de documento del cliente");
+        long numero;
+        try {
+            numero = scanInt.nextLong();
+        } catch (InputMismatchException e) {
+            System.out.println("caracter invalido");
+            agregarCliente(scanInt);
+            return;
+        }
+        System.out.println("Igresa elnombre del cliente");
+        String nombre = scanInt.next();
+        System.out.println("Ingresa el apellido del cliente");
+        String apellido = scanInt.next();
+        System.out.println("Ingresa el teléfono del cliente");
+        String telefono = scanInt.next();
+        cliente = new Cliente(numero, nombre, apellido, telefono);
+        controlPersis.crearCliente(cliente);
+    }
+
+    public void mostrarClientes() throws Exception {
+
+        System.out.println("--------------- LISTA DE CLIENTES ---------------");
+        System.out.println("");
+        ArrayList<Cliente> clientes = controlPersis.traerListaClientes();
+        for (Cliente cliente : clientes) {
+            System.out.println(cliente.toString());   
+        }
+        System.out.println("");
+    }
+
 }

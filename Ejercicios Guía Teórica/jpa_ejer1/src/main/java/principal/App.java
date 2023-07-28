@@ -41,7 +41,11 @@ public class App {
             System.out.println("13. Mostrar Libros");
             System.out.println("14. Mostrar Autores");
             System.out.println("15. Mostrar Editoriales");
-            System.out.println("16. Salir");
+            System.out.println("16. Agregar un Cliente");
+            System.out.println("17. Registrar nuevo Prestamo");
+            System.out.println("18. Mostrar Clientes");
+            System.out.println("19. Mostrar Prestamos");
+            System.out.println("20. Salir");
             System.out.println("");
             System.out.println("Ingresa la opción deseada");
 
@@ -181,6 +185,26 @@ public class App {
                     Menu(scanInt);
                     break;
                 case 16:
+                    System.out.println("");
+                    contLogServ.agregarCliente(scanInt);
+                    Menu(scanInt);
+                    break;
+                case 17:
+                    System.out.println("");
+                    contLogServ.agregarPrestamo(scanInt);
+                    Menu(scanInt);
+                    break;
+                case 18:
+                    System.out.println("");
+                    contLogServ.mostrarClientes();
+                    Menu(scanInt);
+                    break;
+                case 19:
+                    System.out.println("");
+                    contLogServ.mostrarPrestamos();
+                    Menu(scanInt);
+                    break;
+                case 20:
                     System.out.println("Hasta pronto!");
                     break;
                 default:

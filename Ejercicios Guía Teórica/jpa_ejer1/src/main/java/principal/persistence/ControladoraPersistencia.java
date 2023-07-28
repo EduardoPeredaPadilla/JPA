@@ -9,6 +9,8 @@ import java.util.logging.Logger;
 import principal.logica.entities.Autor;
 import principal.logica.entities.Editorial;
 import principal.logica.entities.Libro;
+import principal.logica.entities.Prestamo;
+import principal.logica.entities.Cliente;
 import principal.persistence.exceptions.NonexistentEntityException;
 
 public class ControladoraPersistencia {
@@ -16,6 +18,8 @@ public class ControladoraPersistencia {
     AutorJpaController autorJpa = new AutorJpaController();
     EditorialJpaController editJpa = new EditorialJpaController();
     LibroJpaController libroJpa = new LibroJpaController();
+    PrestamoJpaController prestJpa = new PrestamoJpaController();
+    ClienteJpaController clienteJpa = new ClienteJpaController();
 
     //Métodos para el Autor
 
@@ -112,7 +116,7 @@ public class ControladoraPersistencia {
         return listaEditoriales;
     }
 
-    // Métodos par los Libros
+    // Métodos para los Libros
 
     public void crearLibro (Libro libro) {
         libroJpa.create(libro);
@@ -168,5 +172,87 @@ public class ControladoraPersistencia {
         ArrayList<Libro> listaLibros = new ArrayList<Libro>(listaL);
         return listaLibros;
     }
+
+    //Métodos para los Prestamos
+    public void crearPrestamo (Prestamo prestamo) {
+        prestJpa.create(prestamo);
+    }
+
+    public void eliminarPrestamo(int id) {
+        try {
+            prestJpa.destroy(id);
+        } catch (NonexistentEntityException ex) {
+            Logger.getLogger(ControladoraPersistencia.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void editarPrestamo(Prestamo prestamo) {
+        try {
+            prestJpa.edit(prestamo);
+        } catch (Exception ex) {
+            Logger.getLogger(ControladoraPersistencia.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public Prestamo traerPrestamo(int id) {
+
+        return prestJpa.findPrestamo(id);
+    }
+
+    public ArrayList<Prestamo> traerListaPrestamos() {
+        
+        List<Prestamo> listaP = prestJpa.findPrestamoEntities();
+        ArrayList<Prestamo> listaPrestamos = new ArrayList<Prestamo>(listaP);
+        return listaPrestamos;
+    }
+
+    //Métodos para los Clientes
+    public void crearCliente(Cliente cliente) {
+        clienteJpa.create(cliente);
+    }
+
+    public void eliminarCliente(int id) {
+        try {
+            autorJpa.destroy(id);
+        } catch (NonexistentEntityException ex) {
+            Logger.getLogger(ControladoraPersistencia.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void editarCliente(Cliente cliente) {
+        try {
+            clienteJpa.edit(cliente);
+        } catch (Exception ex) {
+            Logger.getLogger(ControladoraPersistencia.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void darDeBajaCliente(Cliente cliente) {
+        try {
+            clienteJpa.edit(cliente);
+        } catch (Exception ex) {
+            Logger.getLogger(ControladoraPersistencia.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public Cliente traerCliente(int id) {
+
+        return clienteJpa.findCliente(id);
+    }
+
+    public Cliente traerClientePorNombre(String nombre) {
+
+        Cliente cliente = clienteJpa.findClienteByName(nombre);
+        return cliente;
+    }
+
+    public ArrayList<Cliente> traerListaClientes() {
+        
+        List<Cliente> listaC = clienteJpa.findClienteEntities();
+        ArrayList<Cliente> listaClientes = new ArrayList<Cliente>(listaC);
+        return listaClientes;
+    }
+
+
 
 }

@@ -30,10 +30,20 @@ insert into libro
 /*scripts para borrar los agregados despues de ejecutar en VSCode*/
 delete
 	from libro 
-    where ISBN = 7;
+    where ISBN = 12;
 delete
 	from editorial
-    where ID = 6;
+    where ID = 7;
 delete
 	from autor
-    where ID = 6;
+    where ID = 7;
+    
+/*test scripts*/
+select *
+	from autor a
+    where a.nombre = 'Allan_Poe';
+    
+select *
+	from libro l
+    left join autor a on l.autor_id = a.id
+    where a.nombre = 'Allan_Poe';

@@ -7,23 +7,20 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.EntityNotFoundException;
-import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-
-import principal.logica.entities.Autor;
+import principal.logica.entities.Prestamo;
 import principal.persistence.exceptions.NonexistentEntityException;
 
-
-public class AutorJpaController implements Serializable {
+public class PrestamoJpaController implements Serializable {
     
-    public AutorJpaController(EntityManagerFactory emf) {
+    public PrestamoJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
 
-    public AutorJpaController() {
+    public PrestamoJpaController() {
         emf = Persistence.createEntityManagerFactory("libreriaJPAPU");
     }
 
@@ -33,7 +30,7 @@ public class AutorJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(Autor autor) {
+    public void create(Prestamo autor) {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -47,19 +44,19 @@ public class AutorJpaController implements Serializable {
         }
     }
 
-    public void edit(Autor autor) throws NonexistentEntityException, Exception {
+    public void edit(Prestamo prestamo) throws NonexistentEntityException, Exception {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            autor = em.merge(autor);
+            prestamo = em.merge(prestamo);
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                int id = autor.getId();
-                if (findAutor(id) == null) {
-                    throw new NonexistentEntityException("The autor with id " + id + " no longer exists.");
+                int id = prestamo.getId();
+                if (findPrestamo(id) == null) {
+                    throw new NonexistentEntityException("The cliente with id " + id + " no longer exists.");
                 }
             }
             throw ex;
@@ -75,14 +72,14 @@ public class AutorJpaController implements Serializable {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Autor autor;
+            Prestamo prestamo;
             try {
-                autor = em.getReference(Autor.class, id);
-                autor.getId();
+                prestamo = em.getReference(Prestamo.class, id);
+                prestamo.getId();
             } catch (EntityNotFoundException enfe) {
                 throw new NonexistentEntityException("The alumno with id " + id + " no longer exists.", enfe);
             }
-            em.remove(autor);
+            em.remove(prestamo);
             em.getTransaction().commit();
         } finally {
             if (em != null) {
@@ -91,59 +88,47 @@ public class AutorJpaController implements Serializable {
         }
     }
 
-    public List<Autor> findAutorEntities() {
-        return findAutorEntities(true, -1, -1);
+    public List<Prestamo> findPrestamoEntities() {
+        return findPrestamoEntities(true, -1, -1);
     }
 
-    public List<Autor> findAutorEntities(int maxResults, int firstResult) {
-        return findAutorEntities(false, maxResults, firstResult);
+    public List<Prestamo> findPrestamoEntities(int maxResults, int firstResult) {
+        return findPrestamoEntities(false, maxResults, firstResult);
     }
 
-    private List<Autor> findAutorEntities(boolean all, int maxResults, int firstResult) {
+    private List<Prestamo> findPrestamoEntities(boolean all, int maxResults, int firstResult) {
         EntityManager em = getEntityManager();
         try {
-            CriteriaQuery<Autor> cq = em.getCriteriaBuilder().createQuery(Autor.class);
-            cq.select(cq.from(Autor.class));
-            TypedQuery<Autor> q = em.createQuery(cq); // Usa TypedQuery con un tipo específico
+            CriteriaQuery<Prestamo> cq = em.getCriteriaBuilder().createQuery(Prestamo.class);
+            cq.select(cq.from(Prestamo.class));
+            TypedQuery<Prestamo> q = em.createQuery(cq); // Usa TypedQuery con un tipo específico
             if (!all) {
                 q.setMaxResults(maxResults);
                 q.setFirstResult(firstResult);
             }
-            List<Autor> autores = q.getResultList();
-            return autores;
+            List<Prestamo> prestamos = q.getResultList();
+            return prestamos;
         } finally {
             em.close();
         }  
     }
 
-    public Autor findAutor(int id) {
+    public Prestamo findPrestamo(int id) {
         EntityManager em = getEntityManager();
         try {
-            return em.find(Autor.class, id);
+            return em.find(Prestamo.class, id);
         } finally {
             em.close();
         }
     }
 
-    public Autor findAutorByName(String nombre) {
-        EntityManager em = getEntityManager();
-        try {
-            TypedQuery<Autor> query = em.createQuery("SELECT a FROM Autor a WHERE TRIM(LOWER(a.nombre)) = :nombre", Autor.class);
-            query.setParameter("nombre", nombre.toLowerCase().trim());
-            return query.getSingleResult();
-        } catch (NoResultException e) {
-            return null; // Devuelve null si no se encuentra el autor por el nombre
-        } finally {
-            em.close();
-        }
-    }
 
-    public int getAutorCount() {
+    public int getPrestamoCount() {
         EntityManager em = getEntityManager();
         try {
             CriteriaBuilder cb = em.getCriteriaBuilder();
             CriteriaQuery<Long> cq = cb.createQuery(Long.class);
-            Root<Autor> rt = cq.from(Autor.class);
+            Root<Prestamo> rt = cq.from(Prestamo.class);
             cq.select(cb.count(rt));
             Query q = em.createQuery(cq);
             return ((Long) q.getSingleResult()).intValue();
@@ -151,5 +136,4 @@ public class AutorJpaController implements Serializable {
             em.close();
         }
     }
-
 }

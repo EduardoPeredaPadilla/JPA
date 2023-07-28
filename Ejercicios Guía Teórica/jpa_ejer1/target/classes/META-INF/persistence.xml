@@ -5,6 +5,8 @@
     <class>principal.logica.entities.Autor</class>
     <class>principal.logica.entities.Editorial</class>
     <class>principal.logica.entities.Libro</class>
+    <class>principal.logica.entities.Prestamo</class>
+    <class>principal.logica.entities.Cliente</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/libreria?serverTimezone=UTC"/>
       <property name="javax.persistence.jdbc.user" value="root"/>
