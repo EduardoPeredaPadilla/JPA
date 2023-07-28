@@ -6,6 +6,9 @@ select *
 
 select * 
 	from editorial;
+    
+select *
+	from cliente;
 
 /*Agregamos alguno autores*/
 insert into autor
@@ -26,6 +29,13 @@ insert into libro
 	values(2, 1, 2008, 5, 0, 5, 'El_Necronomicron', 2, 2);
 insert into libro
 	values(3, 1, 1843, 5, 2, 3, 'El_Gato_Negro', 1, 1);
+    
+/*Agregamos algunos clientes*/
+insert into cliente
+	values(1, 'Pereda', 123456, 'Eduardo', '7774291131');
+insert into cliente
+	values(2, 'Castro', 123456, 'Luis', '5555123456');
+    
 
 /*scripts para borrar los agregados despues de ejecutar en VSCode*/
 delete
@@ -37,6 +47,9 @@ delete
 delete
 	from autor
     where ID = 7;
+delete
+	from prestamo
+	where ID = 1;
     
 /*test scripts*/
 select *
