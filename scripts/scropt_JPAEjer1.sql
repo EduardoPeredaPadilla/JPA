@@ -12,6 +12,14 @@ select *
     
 select *
 	from prestamo;
+    
+select c.NOMBRE, count(p.ID)
+	from prestamo p
+    left join cliente c on p.CLIENTE_ID = c.ID
+	group by c.NOMBRE;
+    
+select *
+	from cliente_prestamo;
 
 /*Agregamos alguno autores*/
 insert into autor
@@ -50,9 +58,12 @@ delete
 delete
 	from autor
     where ID = 7;
+delete 
+	from cliente
+    where ID = 2;
 delete
 	from prestamo
-	where ID = 1;
+	where ID = 4;
     
 /*test scripts*/
 select *
