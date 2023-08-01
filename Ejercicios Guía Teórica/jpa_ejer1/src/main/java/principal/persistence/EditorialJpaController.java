@@ -102,7 +102,7 @@ public class EditorialJpaController implements Serializable {
         try {
             CriteriaQuery<Editorial> cq = em.getCriteriaBuilder().createQuery(Editorial.class);
             cq.select( cq.from(Editorial.class));
-            Query q = em.createQuery(cq);
+            TypedQuery<Editorial> q = em.createQuery(cq); // Usa TypedQuery con un tipo específico
             if (!all) {
                 q.setMaxResults(maxResults);
                 q.setFirstResult(firstResult);

@@ -12,7 +12,6 @@ import javax.persistence.Persistence;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-
 import principal.logica.entities.Autor;
 import principal.logica.entities.Editorial;
 import principal.logica.entities.Libro;
@@ -105,7 +104,7 @@ public class LibroJpaController implements Serializable {
         try {
             CriteriaQuery<Libro> cq = em.getCriteriaBuilder().createQuery(Libro.class);
             cq.select( cq.from(Libro.class));
-            Query q = em.createQuery(cq);
+            TypedQuery<Libro> q = em.createQuery(cq); // Usa TypedQuery con un tipo específico
             if (!all) {
                 q.setMaxResults(maxResults);
                 q.setFirstResult(firstResult);
