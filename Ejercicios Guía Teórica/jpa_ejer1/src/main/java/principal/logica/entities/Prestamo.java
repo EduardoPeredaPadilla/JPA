@@ -1,11 +1,13 @@
 package principal.logica.entities;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -22,7 +24,7 @@ public class Prestamo {
     private Date fechaFDevolucion;
     @OneToOne
     private Libro libro;
-    @OneToOne
+    @ManyToOne
     private Cliente cliente;
 
 
@@ -86,12 +88,13 @@ public class Prestamo {
 
     @Override
     public String toString() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         return "Préstamo [" +
             " Id = " + getId() +
-            ", Fecha de Prestamo = " + getFechaPrestamo() +
-            ", Fecha de FDevolución = " + getFechaFDevolucion() +
-            getLibro() +
-            getCliente() + " ]";
+            ", Fecha de Prestamo = " + dateFormat.format(getFechaPrestamo()) +
+            ", Fecha de FDevolución = " + dateFormat.format(getFechaFDevolucion()) + 
+            ", Títlo del Libro = " + getLibro().getTitulo() + 
+            ", Nombre del Cliente = " + getCliente().getNombre() + " ]";
     }
 
 

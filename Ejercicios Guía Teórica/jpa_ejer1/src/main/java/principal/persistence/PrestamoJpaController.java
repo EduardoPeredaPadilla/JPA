@@ -7,6 +7,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -30,12 +31,12 @@ public class PrestamoJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(Prestamo autor) {
+    public void create(Prestamo prestamo) {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            em.persist(autor);
+            em.persist(prestamo);
             em.getTransaction().commit();
         } finally {
             if (em != null) {
@@ -122,6 +123,18 @@ public class PrestamoJpaController implements Serializable {
         }
     }
 
+    public List<Prestamo> findPrestamoByCliente() {
+        EntityManager em = getEntityManager();
+        try {
+            TypedQuery<Prestamo> query = em.createQuery("SELECT p FROM Prestamo p JOIN p.cliente c", Prestamo.class);
+            return query.getResultList();
+        } catch (NoResultException e) {
+            return null;
+        } finally {
+            em.close();
+        }
+    }
+
 
     public int getPrestamoCount() {
         EntityManager em = getEntityManager();
@@ -136,4 +149,17 @@ public class PrestamoJpaController implements Serializable {
             em.close();
         }
     }
+
+    public List<Object[]> findTotalPrestamosPorCliente() {
+        EntityManager em = getEntityManager();
+        try {
+            TypedQuery<Object[]> query = em.createQuery("SELECT c, COUNT(p) FROM Prestamo p JOIN p.cliente c GROUP BY c", Object[].class);
+            return query.getResultList();
+        } catch (NoResultException e) {
+            return null;
+        } finally {
+            em.close();
+        }
+    }
+    
 }

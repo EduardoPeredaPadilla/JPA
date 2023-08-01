@@ -45,7 +45,9 @@ public class App {
             System.out.println("17. Registrar nuevo Prestamo");
             System.out.println("18. Mostrar Clientes");
             System.out.println("19. Mostrar Prestamos");
-            System.out.println("20. Salir");
+            System.out.println("20. Mostrar Prestamos por cliente");
+            System.out.println("21. Total de Prestamos por Cliente");
+            System.out.println("22. Salir");
             System.out.println("");
             System.out.println("Ingresa la opción deseada");
 
@@ -205,6 +207,16 @@ public class App {
                     Menu(scanInt);
                     break;
                 case 20:
+                    System.out.println("");
+                    contLogServ.mostrarPrestamosPorCliente();
+                    Menu(scanInt);
+                    break;
+                case 21:
+                    System.out.println("");
+                    contLogServ.conteoPrestamosPorCliente();
+                    Menu(scanInt);
+                    break;
+                case 22:
                     System.out.println("Hasta pronto!");
                     break;
                 default:

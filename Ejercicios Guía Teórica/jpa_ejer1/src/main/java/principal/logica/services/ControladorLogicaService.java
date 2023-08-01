@@ -629,12 +629,22 @@ public class ControladorLogicaService {
             LocalDate fechaHoy = LocalDate.now();
             System.out.println(fechaHoy);
             Date fechaPrestamo = Date.from(fechaHoy.atStartOfDay(ZoneId.systemDefault()).toInstant());
-            LocalDate fechaDev = LocalDate.of(fechaHoy.getYear(), fechaHoy.getMonth(), fechaHoy.getDayOfMonth() + 3);
+            //Validamos di la fecha de devolución será en el mismo mes o en el sigueinte
+            LocalDate fechaDev = LocalDate.now().plusDays(5);
+            // if (fechaHoy.getDayOfMonth()>25) {
+            //     fechaDev = LocalDate.of(fechaHoy.getYear(), fechaHoy.getMonthValue() + 1, fechaHoy.getDayOfMonth() + 3 -31);
+            // } else {
+            //     fechaDev = LocalDate.of(fechaHoy.getYear(), fechaHoy.getMonth(), fechaHoy.getDayOfMonth() + 3);
+            // }
+            
             System.out.println(fechaDev);
             Date fechaDevolucion = Date.from(fechaDev.atStartOfDay(ZoneId.systemDefault()).toInstant());
             // Definimos el libro para el prestamo
             Libro libro = buscarLibroPorTituloParaPrestamo(scanInt);
             prestamo = new Prestamo(fechaPrestamo, fechaDevolucion, libro, cliente);
+            ArrayList<Prestamo> prestamos = new ArrayList<>();
+            prestamos.add(prestamo);
+            cliente.setPrestamos(prestamos);
             controlPersis.crearPrestamo(prestamo);
         } catch (Exception e) {
             throw e;
@@ -680,7 +690,8 @@ public class ControladorLogicaService {
                     apellido = scanInt.next();
                     System.out.println("Ingresa elteléfono del nuevo cliente");
                     telefono = scanInt.next();
-                    cliente = new Cliente(documento, clientName, apellido, telefono);
+                    ArrayList<Prestamo> prestamos = new ArrayList<>();
+                    cliente = new Cliente(documento, clientName, apellido, telefono, prestamos);
                     agregarClientedesdePrestamo(cliente);
                     return cliente;
                 case 2:
@@ -728,8 +739,13 @@ public class ControladorLogicaService {
             }
         } else {
             if (libro.getEjemplaresRestantes() > 0) {
+                // System.out.println("Ejempleres diponibles = " + libro.getEjemplaresPrestados());
+                // System.out.println("Ejempleres diponibles = " + libro.getEjemplaresRestantes());
                 libro.setEjemplaresPrestados(libro.getEjemplaresPrestados() + 1);
                 libro.setEjemplaresRestantes(libro.getEjemplares() - libro.getEjemplaresPrestados());
+                // System.out.println("Ejempleres diponibles = " + libro.getEjemplaresPrestados());
+                // System.out.println("Ejempleres diponibles = " + libro.getEjemplaresRestantes());
+                controlPersis.editarLibro(libro);
                 return libro;    
             } else {
                 System.out.println("No hay ejemplares en stock para presta de este libro");
@@ -751,6 +767,29 @@ public class ControladorLogicaService {
         }
         System.out.println("");
     }
+
+    public void mostrarPrestamosPorCliente() throws Exception {
+
+        System.out.println("-----LISTA DE PRESTAMOS POR CLIENTE -------------");
+        System.out.println("");
+        ArrayList<Prestamo> prestamos = controlPersis.listaPrestamosPorCliente();
+        for (Prestamo prestamo : prestamos) {
+            System.out.println(prestamo.toString());
+        }
+        System.out.println("");
+    }
+
+    public void conteoPrestamosPorCliente() throws Exception {
+
+        System.out.println("---- TOTAL DE PESTAMOS POR CLIENTE -----");
+        System.out.println("");
+        ArrayList<Object[]> resultados = controlPersis.conteoPrestamosPorCliente();
+        for (Object[] resultado : resultados) {
+            Cliente cliente = (Cliente) resultado[0];
+            long totalPrestamos = (long) resultado[1];
+            System.out.println("Cliente = " + cliente.getNombre() + ", Total de Prstamos = " + totalPrestamos);
+        }
+    }
     
     //Métodos para los Clientes
     public void agregarCliente(Scanner scanInt) throws Exception {
@@ -764,16 +803,17 @@ public class ControladorLogicaService {
             numero = scanInt.nextLong();
         } catch (InputMismatchException e) {
             System.out.println("caracter invalido");
-            agregarCliente(scanInt);
+            // agregarCliente(scanInt);
             return;
         }
-        System.out.println("Igresa elnombre del cliente");
+        System.out.println("Igresa el nombre del cliente");
         String nombre = scanInt.next();
         System.out.println("Ingresa el apellido del cliente");
         String apellido = scanInt.next();
         System.out.println("Ingresa el teléfono del cliente");
         String telefono = scanInt.next();
-        cliente = new Cliente(numero, nombre, apellido, telefono);
+        ArrayList<Prestamo> prestamos = new ArrayList<>();
+        cliente = new Cliente(numero, nombre, apellido, telefono, prestamos);
         controlPersis.crearCliente(cliente);
     }
 

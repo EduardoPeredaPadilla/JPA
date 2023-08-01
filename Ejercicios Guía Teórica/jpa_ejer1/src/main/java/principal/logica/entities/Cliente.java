@@ -1,10 +1,13 @@
 package principal.logica.entities;
 
+import java.util.ArrayList;
+
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Cliente {
@@ -20,25 +23,31 @@ public class Cliente {
     private String apellido;
     @Basic
     private String telefono;
+    @OneToMany(mappedBy = "cliente")
+    private ArrayList<Prestamo> prestamos;
 
 
     public Cliente() {
     }
 
-    public Cliente(long documento, String nombre, String apellido, String telefono) {
+    public Cliente(long documento, String nombre, String apellido, String telefono, ArrayList<Prestamo> prestamos) {
         this.documento = documento;
         this.nombre = nombre;
         this.apellido = apellido;
         this.telefono = telefono;
+        this.prestamos = prestamos;
     }
 
-    public Cliente(int id, long documento, String nombre, String apellido, String telefono) {
+
+    public Cliente(int id, long documento, String nombre, String apellido, String telefono, ArrayList<Prestamo> prestamos) {
         this.id = id;
         this.documento = documento;
         this.nombre = nombre;
         this.apellido = apellido;
         this.telefono = telefono;
+        this.prestamos = prestamos;
     }
+
 
     public int getId() {
         return this.id;
@@ -80,6 +89,14 @@ public class Cliente {
         this.telefono = telefono;
     }
 
+    public ArrayList<Prestamo> getPrestamos() {
+        return this.prestamos;
+    }
+
+    public void setPrestamos(ArrayList<Prestamo> prestamos) {
+        this.prestamos = prestamos;
+    }
+
     @Override
     public String toString() {
         return "Cliente [" +
@@ -87,7 +104,8 @@ public class Cliente {
             ", Documento = " + getDocumento() +
             ", Nombre = " + getNombre() +
             ", Apellido = " + getApellido() +
-            ", Teléfono = " + getTelefono() + " ]";
+            ", Teléfono = " + getTelefono() + 
+            " \n " + getPrestamos().toString() + " ]";
     }
 
 }

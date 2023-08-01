@@ -206,6 +206,20 @@ public class ControladoraPersistencia {
         return listaPrestamos;
     }
 
+    public ArrayList<Object[]> conteoPrestamosPorCliente() {
+
+        List<Object[]> listaP = prestJpa.findTotalPrestamosPorCliente();
+        ArrayList<Object[]> listaPrestamos = new ArrayList<Object[]>(listaP);
+        return listaPrestamos;
+    }
+
+    public ArrayList<Prestamo> listaPrestamosPorCliente() {
+
+        List<Prestamo> listaP = prestJpa.findPrestamoByCliente();
+        ArrayList<Prestamo> listaPrestamos = new ArrayList<Prestamo>(listaP);
+        return listaPrestamos;
+    }
+
     //Métodos para los Clientes
     public void crearCliente(Cliente cliente) {
         clienteJpa.create(cliente);
