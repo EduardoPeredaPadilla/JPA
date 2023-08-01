@@ -624,6 +624,11 @@ public class ControladorLogicaService {
             //Dfinimos el cliente para el prestamo
             System.out.println("Seleccionar//Agregar cliente");
             Cliente cliente = buscarClientePorNombredesdePrestamo(scanInt);
+            //Validamos el Score del cliente para ver si es viable el prestamo del libro
+            if (cliente.getScore() <= 0) {
+                System.out.println("El score del Cliente " + cliente.getNombre() + " es de " + cliente.getScore() +", por lo que no está habilitado para nuevos prestamos");
+                return;
+            }
             // Definimos la fecha del prestamo fecha actual
             System.out.println("Fecha del prestamo");
             LocalDate fechaHoy = LocalDate.now();
@@ -642,10 +647,21 @@ public class ControladorLogicaService {
             // Definimos el libro para el prestamo
             Libro libro = buscarLibroPorTituloParaPrestamo(scanInt);
             prestamo = new Prestamo(fechaPrestamo, fechaDevolucion, libro, cliente);
-            ArrayList<Prestamo> prestamos = new ArrayList<>();
+            ArrayList<Prestamo> prestamos = cliente.getPrestamos();
+            //Validamos que el cliuente no tenga ya este libro prestado
+            for (Prestamo prestamoCliente : prestamos) {
+                if (libro.getTitulo().equalsIgnoreCase(prestamoCliente.getLibro().getTitulo())) {
+                    System.out.println("El cliente " + cliente.getNombre() + " tiene un prestamo registrado del libro " + libro.getTitulo());
+                    System.out.println("No se puede prestar el mismo libro al cliente");
+                    return;
+                }
+            }
             prestamos.add(prestamo);
             cliente.setPrestamos(prestamos);
-            controlPersis.crearPrestamo(prestamo);
+            cliente.setTotalPrestamos(cliente.getTotalPrestamos() + 1);
+            cliente.setPrestamosPorDevolver(cliente.getPrestamosPorDevolver() + 1);
+            controlPersis.editarCliente(cliente);
+            //controlPersis.crearPrestamo(prestamo);
         } catch (Exception e) {
             throw e;
         }
@@ -789,6 +805,57 @@ public class ControladorLogicaService {
             long totalPrestamos = (long) resultado[1];
             System.out.println("Cliente = " + cliente.getNombre() + ", Total de Prstamos = " + totalPrestamos);
         }
+    }
+
+    public void devolverLibro(Scanner scanInt) throws Exception {
+
+        System.out.println("------------------- DEVOLVER LIBRO ------------------");
+        System.out.println("");
+        System.out.println("Ingrese el nombre del cliente");
+        String nombreCliente = scanInt.next();
+        Cliente cliente = controlPersis.traerClientePorNombre(nombreCliente);
+        if (cliente == null) {
+            System.out.println("El cliente ingresado no esta registrado");
+            return;
+        } else {
+            ArrayList<Prestamo> prestamos = cliente.getPrestamos();
+            for (Prestamo prestamo : prestamos) {
+                System.out.println(prestamo.toString());
+            }
+            System.out.println("Ingresa el nombre del libro a devolver");
+            String tituloLibro = scanInt.next();
+            for (Prestamo prestamo : prestamos) {
+                if (prestamo.getLibro().getTitulo().equalsIgnoreCase(tituloLibro)) {
+                    LocalDate fechaHoy = LocalDate.now();
+                    Date fechaDev = Date.from(fechaHoy.atStartOfDay(ZoneId.systemDefault()).toInstant());
+                    prestamo.setFechaFDevolucionReal(fechaDev);
+                    if (fechaDev.compareTo(prestamo.getFechaFDevolucion()) > 0) {
+                        System.out.println("La fecha programada de devolución ya paso, esto afectará el score del cliente");
+                        prestamo.setFechaFDevolucionReal(fechaDev);
+                        prestamo.setEstatus("Devuelto fuera de fecha");
+                        cliente.setPrestamosPorDevolver(cliente.getPrestamosPorDevolver() - 1);
+                        cliente.setPrestamosDevueltosFueraDeTiempo(cliente.getPrestamosDevueltosFueraDeTiempo() + 1);
+                        cliente.setScore(cliente.getScore() - 1);
+                        prestamo.getLibro().setEjemplaresPrestados(prestamo.getLibro().getEjemplaresPrestados() - 1);
+                        prestamo.getLibro().setEjemplaresRestantes(prestamo.getLibro().getEjemplaresRestantes() + 1);
+                        controlPersis.editarLibro(prestamo.getLibro());
+                        controlPersis.editarPrestamo(prestamo);
+                        controlPersis.editarCliente(cliente);
+                        System.out.println("Libro devuelto y registrado exitosamente");
+                        return;
+                    } else {
+                        System.out.println("Devolución en tiempo correcto");
+                        prestamo.setFechaFDevolucionReal(fechaDev);
+                        prestamo.setEstatus("Devuelto");
+                        System.out.println("Libro devuelto y registrado exitosamente");
+                        return;
+                    }
+                }
+            }
+            System.out.println("El nombre del libro no esta en los prestamos del cliente");
+            return;
+        }
+
     }
     
     //Métodos para los Clientes

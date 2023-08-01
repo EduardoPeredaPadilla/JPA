@@ -3,6 +3,7 @@ package principal.logica.entities;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -22,10 +23,14 @@ public class Prestamo {
     private Date fechaPrestamo;
     @Temporal(TemporalType.DATE)
     private Date fechaFDevolucion;
+    @Temporal(TemporalType.DATE)
+    private Date fechaFDevolucionReal;
     @OneToOne
     private Libro libro;
     @ManyToOne
     private Cliente cliente;
+    @Basic
+    private String estatus;
 
 
     public Prestamo() {
@@ -36,15 +41,23 @@ public class Prestamo {
         this.fechaFDevolucion = fechaFDevolucion;
         this.libro = libro;
         this.cliente = cliente;
+        this.estatus = "Por Devolver";
+        this.fechaFDevolucionReal = null;
     }
 
-    public Prestamo(int id, Date fechaPrestamo, Date fechaFDevolucion, Libro libro, Cliente cliente) {
+
+
+    public Prestamo(int id, Date fechaPrestamo, Date fechaFDevolucion, Date fechaFDevolucionReal, Libro libro, Cliente cliente, String estatus) {
         this.id = id;
         this.fechaPrestamo = fechaPrestamo;
         this.fechaFDevolucion = fechaFDevolucion;
+        this.fechaFDevolucionReal = fechaFDevolucionReal;
         this.libro = libro;
         this.cliente = cliente;
+        this.estatus = estatus;
     }
+
+
 
     public int getId() {
         return this.id;
@@ -86,6 +99,22 @@ public class Prestamo {
         this.cliente = cliente;
     }
 
+    public Date getFechaFDevolucionReal() {
+        return this.fechaFDevolucionReal;
+    }
+
+    public void setFechaFDevolucionReal(Date fechaFDevolucionReal) {
+        this.fechaFDevolucionReal = fechaFDevolucionReal;
+    }
+
+    public String getEstatus() {
+        return this.estatus;
+    }
+
+    public void setEstatus(String estatus) {
+        this.estatus = estatus;
+    }
+
     @Override
     public String toString() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -94,7 +123,9 @@ public class Prestamo {
             ", Fecha de Prestamo = " + dateFormat.format(getFechaPrestamo()) +
             ", Fecha de FDevolución = " + dateFormat.format(getFechaFDevolucion()) + 
             ", Títlo del Libro = " + getLibro().getTitulo() + 
-            ", Nombre del Cliente = " + getCliente().getNombre() + " ]";
+            ", Nombre del Cliente = " + getCliente().getNombre() + 
+            ", Estatus = " + getEstatus() + 
+            ", Fecha de Devolución Real = " + getFechaFDevolucionReal() + " ]";
     }
 
 
