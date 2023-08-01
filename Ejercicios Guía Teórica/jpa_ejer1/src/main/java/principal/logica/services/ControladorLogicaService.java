@@ -7,12 +7,6 @@ import java.util.Date;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
-
-import javax.sound.midi.Soundbank;
-
-import com.mysql.cj.xdevapi.Client;
-
-import javafx.scene.control.Menu;
 import principal.logica.entities.Autor;
 import principal.logica.entities.Cliente;
 import principal.logica.entities.Editorial;
@@ -244,7 +238,14 @@ public class ControladorLogicaService {
             //El uruario ingresa los datos del libro
             System.out.println("Ingresa el título del libro");
             libro.setTitulo(scanInt.next());
-            System.out.println("Ingresa el año del libro");
+            //Verificamos si el libro ya existe
+            Libro libroExt = controlPersis.traerLibroPorTitulo(libro.getTitulo());
+            if (libroExt != null) {
+                System.out.println("El libro que deseas agregar ya existe");
+                System.out.println(libroExt.toString());
+                return;
+            }
+            System.out.println("Ingresa el año del libro");         
             libro.setAnio(scanInt.nextInt());
             System.out.println("Ingresa el número de ejemplares que exiten en la librería");
             libro.setEjemplares(scanInt.nextInt());

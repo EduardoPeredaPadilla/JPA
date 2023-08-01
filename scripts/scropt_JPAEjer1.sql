@@ -9,6 +9,9 @@ select *
     
 select *
 	from cliente;
+    
+select *
+	from prestamo;
 
 /*Agregamos alguno autores*/
 insert into autor
